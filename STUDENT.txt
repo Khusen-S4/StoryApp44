@@ -25,15 +25,28 @@ Ada token → load story dari API
 2. Kamu membuat halaman login
 3. Membuat halaman Register
 
-Masalah Notifikasi :
-Notifikasi sebenarnya sudah berhasil dipicu oleh Service Worker.
-Hal ini dibuktikan oleh log berikut:
+GitHub :
+folder > klik kanan git bash :
+git init
+git add .
+git commit -m "first commit"
+git branch -M main
+git remote add origin https://github.com/Khusen-S4/StoryApp44.git
+git push -u origin main
 
-[HOME] Notification permission: granted
-[HOME] Message dikirim ke SW
-[SW] Message diterima: {type: 'NEW_STORY'}
-[SW] Popup notifikasi ditampilkan
+di website github :
+new repositori > setelah selesai maka ke setting page :
+Kemudian, isikan beberapa kolom input berikut.
 
+Source: Deploy from a branch
+Branch: main
+Select folder: /docs
 
-Namun, secara perilaku browser, system notification tidak ditampilkan secara visual ketika halaman web sedang aktif atau berada di foreground.
-Notifikasi akan muncul ketika tab tidak aktif, browser diminimize, atau aplikasi berada di background, sesuai standar Notification API.
+di bash lakukan :
+1 npm run build
+2 folder dist gantinama menjadi docs
+3 di bash lakukan
+git add docs/
+git commit -m "First deploy"
+git push -u origin main
+4 Akses url sudah siap misal nya https://khusen-s4.github.io/StoryApp44/
