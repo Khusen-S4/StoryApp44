@@ -1,5 +1,6 @@
 import HomeView from "./home-view.js";
 import HomePresenter from "./home-presenter.js";
+import storyMarker from "../../../public/images/marker-bawah.png";
 
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -53,7 +54,7 @@ export default class HomePage {
     const container = document.getElementById("story-list");
 
     const customStoryIcon = L.icon({
-      iconUrl: "/images/marker-bawah.png",
+      iconUrl: storyMarker,
       iconSize: [32, 42],
       iconAnchor: [16, 42],
       popupAnchor: [0, -36],
