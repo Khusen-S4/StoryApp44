@@ -1,0 +1,39 @@
+APP_URL=<url_aplikasi>
+MAP_SERVICE_API_KEY=<api_key>
+
+Alur Pertama
+1. Ketika penguna akses ke homepage : 
+  *jika punya token maka Api akan Get /stories
+  *jika tidak punya Token maka akan dialihkan ke halaman Login kemudian mendapatkan token untuk Get/stories
+  ✔ Pertama tetap memanggil HomePage
+  ✔ HomePage mengecek token
+  ✔ Kalau belum ada token → pindah ke halaman login
+
+  ✨ Alur lengkap setelah ini:
+1️⃣ User buka halaman → diarahkan ke #/
+2️⃣ HomePage mengecek token
+
+Tidak ada token → redirect ke #/login
+
+Ada token → load story dari API
+
+3️⃣ User login → API mengembalikan token
+4️⃣ Token disimpan di localStorage
+5️⃣ Redirect ke #/
+6️⃣ HomePage mengambil story dan menampilkannya
+
+2. Kamu membuat halaman login
+3. Membuat halaman Register
+
+Masalah Notifikasi :
+Notifikasi sebenarnya sudah berhasil dipicu oleh Service Worker.
+Hal ini dibuktikan oleh log berikut:
+
+[HOME] Notification permission: granted
+[HOME] Message dikirim ke SW
+[SW] Message diterima: {type: 'NEW_STORY'}
+[SW] Popup notifikasi ditampilkan
+
+
+Namun, secara perilaku browser, system notification tidak ditampilkan secara visual ketika halaman web sedang aktif atau berada di foreground.
+Notifikasi akan muncul ketika tab tidak aktif, browser diminimize, atau aplikasi berada di background, sesuai standar Notification API.
