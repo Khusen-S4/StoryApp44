@@ -6,6 +6,7 @@ export default class HomePresenter {
     this.view = view;
     this.stories = [];
     this.refreshInterval = null;
+    this.lastStoryId = null; // ✅ penanda
   }
 
   async init() {
@@ -40,11 +41,37 @@ export default class HomePresenter {
 
   async _loadStories() {
     const stories = await this.fetchStories();
-    this.stories = stories;
 
-    // render langsung semua story
+    // pertama kali load → hanya simpan ID
+    if (!this.lastStoryId && stories.length > 0) {
+      this.lastStoryId = stories[0].id;
+    } 
+    // refresh berikutnya → cek perubahan
+    else if (stories.length > 0 && stories[0].id !== this.lastStoryId) {
+      const newStory = stories[0];
+      this.lastStoryId = newStory.id;
+
+      this._notifyNewStory(newStory); // 🔔
+    }
+
+    this.stories = stories;
     this.view.renderStories(this.stories);
   }
+  async _notifyNewStory(story) {
+    if (!("serviceWorker" in navigator)) return;
+
+    const registration = await navigator.serviceWorker.ready;
+
+    registration.active?.postMessage({
+      type: "NEW_STORY",
+      payload: {
+        title: "Story Baru 🎉",
+        body: `${story.name}: ${story.description}`,
+      },
+    });
+  }
+
+
 
   startAutoRefresh() {
     this.refreshInterval = setInterval(async () => {
@@ -59,11 +86,4 @@ export default class HomePresenter {
     }
   }
 
-  // DELETE ALL STORIES (IndexedDB)
-  async deleteAllStories() {
-    await clearStories();
-    this.stories = [];
-    this.view.renderStories([]);
-    console.log("[IndexedDB] Semua stories dihapus");
-  }
 }

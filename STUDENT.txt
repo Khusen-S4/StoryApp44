@@ -50,3 +50,11 @@ git add docs/
 git commit -m "First deploy"
 git push -u origin main
 4 Akses url sudah siap misal nya https://khusen-s4.github.io/StoryApp44/
+
+Masalah subscribe dan notifikasi :
+Aplikasi melakukan subscribe ke endpoint /notifications/subscribe
+setelah izin notifikasi diberikan oleh pengguna. 
+Story API Dicoding hanya menyediakan mekanisme pendaftaran subscription, 
+dan tidak mengirim push notification otomatis saat penambahan story. 
+Oleh karena itu, pengujian push notification dilakukan melalui DevTools
+untuk memastikan Service Worker dapat menangani event push dengan benar.

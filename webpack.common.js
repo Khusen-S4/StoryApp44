@@ -1,5 +1,6 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const CopyWebpackPlugin = require("copy-webpack-plugin"); // ⬅️ TAMBAHKAN
 
 module.exports = {
   entry: {
@@ -20,7 +21,6 @@ module.exports = {
         test: /\.css$/,
         use: ["style-loader", "css-loader"],
       },
-
       {
         test: /\.(png|jpe?g|gif|svg)$/i,
         type: "asset/resource",
@@ -31,6 +31,14 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, "src/index.html"),
+    }),
+
+    // ⬇️ INI BAGIAN PENTING
+    new CopyWebpackPlugin({
+      patterns: [
+        { from: "src/public/sw.js", to: "sw.js" },
+        { from: "src/public", to: ""}
+      ],
     }),
   ],
 

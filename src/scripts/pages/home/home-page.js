@@ -24,7 +24,9 @@ export default class HomePage {
           <div class="home-actions">
             <button class="btn-secondary" id="push-toggle-btn">🔔 Subscribe</button>
             <a href="#/add-story" class="btn-primary" id="go-add-story">➕ Tambah Story</a>
-            <button id="delete-stories-btn" class="btn-secondary">🗑 Hapus Semua Story</button>
+
+            <button class="btn-secondary hidden" id="install-btn">⬇ Install App</button>
+            
           </div>
         </section>
 
@@ -40,14 +42,46 @@ export default class HomePage {
   }
 
   async afterRender() {
+
+    let deferredPrompt;
+    const installBtn = document.getElementById("install-btn");
+
+    window.addEventListener("beforeinstallprompt", (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+
+      if (installBtn) {
+        installBtn.classList.remove("hidden");
+      }
+    });
+
+    installBtn?.addEventListener("click", async () => {
+      if (!deferredPrompt) return;
+
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+
+      if (outcome === "accepted") {
+        console.log("[PWA] User accepted install");
+      } else {
+        console.log("[PWA] User dismissed install");
+      }
+
+      deferredPrompt = null;
+      installBtn.classList.add("hidden");
+    });
+
+    
     if ("serviceWorker" in navigator) {
       try {
-        const registration = await navigator.serviceWorker.register("/sw.js");
-        console.log("[SW] Service Worker terdaftar:", registration);
+        await navigator.serviceWorker.register("/sw.js");
+        await navigator.serviceWorker.ready;
+        console.log("[SW] Service Worker siap");
       } catch (err) {
-        console.error("[SW] Gagal mendaftar Service Worker:", err);
+        console.error("[SW] Registrasi gagal:", err);
       }
     }
+
     // =================
     // PRESENTER
     // =================
@@ -75,14 +109,6 @@ export default class HomePage {
 
     await presenter.init();
 
-    // =================
-    // DELETE ALL STORIES
-    // =================
-    const deleteBtn = document.getElementById("delete-stories-btn");
-    deleteBtn?.addEventListener("click", async () => {
-      await presenter.deleteAllStories();
-      alert("Semua story berhasil dihapus!");
-    });
 
     // =================
     // AUTH CHECK
@@ -144,12 +170,18 @@ export default class HomePage {
     const pushBtn = document.getElementById("push-toggle-btn");
 
     async function getPushSubscription() {
+      if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
+        return null;
+      }
+
       const registration = await navigator.serviceWorker.ready;
-      return registration.pushManager.getSubscription();
+      return await registration.pushManager.getSubscription();
     }
+
 
     async function subscribePush() {
       if (!("serviceWorker" in navigator) || !("PushManager" in window)) return;
+
       const token = localStorage.getItem("token");
       if (!token) return;
 
@@ -162,41 +194,99 @@ export default class HomePage {
       const registration = await navigator.serviceWorker.ready;
       const { urlBase64ToUint8Array } = await import("../../utils/index.js");
 
-      const VAPID_PUBLIC_KEY = "BCCs2eonMI-6H2ctvFaWg-UYdDv387Vno_bzUzALpB442r2lCnsHmtrx8biyPi_E-1fSGABK_Qs_GlvPoJJqxbk";
+      const VAPID_PUBLIC_KEY =
+        "BCCs2eonMI-6H2ctvFaWg-UYdDv387Vno_bzUzALpB442r2lCnsHmtrx8biyPi_E-1fSGABK_Qs_GlvPoJJqxbk";
 
       const subscription = await registration.pushManager.subscribe({
         userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
       });
 
+      // ✅ UBAH KE FORMAT YANG DIMINTA API
+      const subscriptionJSON = subscription.toJSON();
+
       const response = await fetch(
         "https://story-api.dicoding.dev/v1/notifications/subscribe",
         {
           method: "POST",
-          headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-          body: JSON.stringify(subscription),
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            endpoint: subscriptionJSON.endpoint,
+            keys: {
+              auth: subscriptionJSON.keys.auth,
+              p256dh: subscriptionJSON.keys.p256dh,
+            },
+          }),
         }
       );
 
-      if (!response.ok && response.status !== 400) {
-        console.warn("[PUSH] Gagal kirim subscription:", response.status);
-      } else {
-        console.log("[PUSH] Subscription aktif / sudah terdaftar");
+      if (!response.ok) {
+        throw new Error(`Subscribe gagal: ${response.status}`);
       }
+
+      console.log("[PUSH] Subscribe berhasil (201)");
     }
 
+
+
     async function unsubscribePush() {
+      if (!("serviceWorker" in navigator)) return;
+
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
       const registration = await navigator.serviceWorker.ready;
       const subscription = await registration.pushManager.getSubscription();
       if (!subscription) return;
+
+      // ✅ WAJIB: buat ulang subscriptionJSON di sini
+      const subscriptionJSON = subscription.toJSON();
+
+      // 1️⃣ HAPUS DARI SERVER
+      const response = await fetch(
+        "https://story-api.dicoding.dev/v1/notifications/subscribe",
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            endpoint: subscriptionJSON.endpoint,
+            keys: {
+              auth: subscriptionJSON.keys.auth,
+              p256dh: subscriptionJSON.keys.p256dh,
+            },
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        console.warn("[PUSH] Gagal unsubscribe di server:", response.status);
+      }
+
+      // 2️⃣ HAPUS DARI BROWSER
       await subscription.unsubscribe();
-      console.log("[PUSH] Unsubscribed");
+
+      console.log("[PUSH] Unsubscribe berhasil");
     }
 
+
+
+
     async function updatePushButton() {
+      if (!pushBtn) return;
+
       const subscription = await getPushSubscription();
       pushBtn.textContent = subscription ? "🔕 Unsubscribe" : "🔔 Subscribe";
     }
+
+    await navigator.serviceWorker.ready;
+    await updatePushButton();
+
 
     pushBtn.addEventListener("click", async () => {
       const subscription = await getPushSubscription();
@@ -208,6 +298,6 @@ export default class HomePage {
       await updatePushButton();
     });
 
-    await updatePushButton();
+    
   }
 }

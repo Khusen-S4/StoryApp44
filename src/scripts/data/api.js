@@ -48,6 +48,24 @@ class Api {
 
     return response.json();
   }
+
+  // id untuk item ke page-item.js
+  static async getStoryDetail(id) {
+    const token = localStorage.getItem("token");
+
+    const response = await fetch(
+      `https://story-api.dicoding.dev/v1/stories/${id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    const result = await response.json();
+    return result.story;
+  }
+
 }
 
 export default Api;

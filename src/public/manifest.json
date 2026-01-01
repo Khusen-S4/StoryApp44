@@ -1,0 +1,22 @@
+{
+  "name": "Story App",
+  "short_name": "Story",
+  "description": "Aplikasi berbagi cerita berbasis lokasi",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#4f46e5",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "./images/st317.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "./images/st317.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

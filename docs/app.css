@@ -59,6 +59,7 @@ h6 {
 
   box-sizing: border-box;
 }
+
 .hidden {
   display: none !important;
   visibility: hidden !important;

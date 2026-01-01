@@ -270,7 +270,8 @@ header {
 
 /* Story card */
 .story-grid {
-  min-height: 300px;
+  min-height: 200px;
+  max-height: 500px;
   padding: 0 16px 32px;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -297,12 +298,14 @@ header {
   object-fit: cover;
 }
 .story-card h3 {
+  margin: 0.75rem;
   padding: 10px 12px 4px;
   font-size: var(--h5-size); /* panggil ukuran H3 dari variabel */
   color: var(--text); /* warna teks utama */
 }
 
 .story-card p {
+  margin: 0.5rem 0.75rem;
   padding: 0 12px 8px;
   font-size: var(--h6-size);
   color: #444;
@@ -310,6 +313,14 @@ header {
 
 .story-card small {
   color: #777;
+}
+.story-card .story-description,
+.story-card p:nth-of-type(1) {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;       /* jumlah baris */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Untuk button class="drawer-button">☰</button> */
@@ -611,6 +622,113 @@ header {
 .camera-box {
   max-width: 100%;
 }
+
+/* =======================
+   Gaya tombol sekunder
+======================= */
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px; /* jarak ikon dengan teks */
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  background-color: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-secondary:hover {
+  background-color: #e0e0e0;
+  border-color: #999;
+}
+
+.btn-secondary:active {
+  background-color: #d0d0d0;
+  transform: translateY(1px);
+}
+
+.btn-secondary:disabled {
+  background-color: #f9f9f9;
+  border-color: #ddd;
+  color: #aaa;
+  cursor: not-allowed;
+}
+
+/* =======================
+   Tambahan untuk tombol icon
+======================= */
+.btn-secondary svg,
+.btn-secondary img {
+  width: 16px;
+  height: 16px;
+}
+
+/* Optional: beri warna berbeda untuk tombol penting/terpilih */
+.btn-secondary.active {
+  background-color: #ffecb3;
+  border-color: #ffc107;
+}
+
+/* page-item.js */
+.item-detail-wrapper {
+  max-width: 900px;
+  margin: 0 auto;
+  margin-top: 80px;
+  padding: 1rem;
+}
+
+.item-card {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  margin-top: 1rem;
+}
+
+.item-image {
+  width: 100%;
+  max-height: 420px;
+  object-fit: cover;
+}
+
+.item-content {
+  padding: 1.25rem;
+}
+
+.item-title {
+  margin: 0 0 0.5rem;
+}
+
+.item-date {
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.item-description {
+  margin: 1rem 0;
+  line-height: 1.6;
+}
+
+.item-location {
+  font-size: 0.9rem;
+  color: #444;
+}
+
+.back-btn {
+  margin-bottom: 0.75rem;
+}
+
+.error-text {
+  color: red;
+  text-align: center;
+  margin-top: 2rem;
+}
+
+
 
 @media (min-width: 768px) {
   .container {

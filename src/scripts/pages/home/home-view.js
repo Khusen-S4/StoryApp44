@@ -1,9 +1,8 @@
-// scripts/pages/home/home-view.js
 import L from "leaflet";
 
 export default class HomeView {
   constructor({ container, customIcon }) {
-    this._map = null;  // private field
+    this._map = null;
     this.container = container;
     this.customIcon = customIcon;
     this.markers = [];
@@ -15,7 +14,7 @@ export default class HomeView {
   }
 
   initMap() {
-    if (this._map) return; // safety guard
+    if (this._map) return;
 
     this._map = L.map("map").setView([-2.5, 118], 5);
 
@@ -26,72 +25,79 @@ export default class HomeView {
   }
 
   clearMarkers() {
-    this.markers.forEach(marker => {
-      this._map.removeLayer(marker);
-    });
+    this.markers.forEach((marker) => this._map.removeLayer(marker));
     this.markers = [];
   }
 
+  // ======================
+  // STORY CARD TEMPLATE
+  // ======================
+  createStoryItem(story) {
+    return `
+      <article class="story-card story-item" data-id="${story.id}">
+        <img
+          src="${story.photoUrl}"
+          class="story-img"
+          alt="Foto story oleh ${story.name}: ${story.description}"
+          onerror="this.onerror=null;this.src='/images/gambar-error.png';"
+        />
+        <h3>${story.name}</h3>
+        <p>${story.description}</p>
+        <p><small>${story.createdAt}</small></p>
+        <p><small>Lokasi: ${story.lat ?? "-"}, ${story.lon ?? "-"}</small></p>
+      </article>
+    `;
+  }
+
+  // ======================
+  // RENDER STORIES + MAP
+  // ======================
   renderStories(stories) {
     this.container.innerHTML = "";
     this.clearMarkers();
 
     stories.forEach((story) => {
-      const hasLocation = story.lat && story.lon;
-      const cardId = `story-${story.lat}-${story.lon}`.replace(/\./g, "_");
+      const cardId = `story-${story.id}`;
 
-      // CARD
-      this.container.innerHTML += `
-        <div class="story-card" id="${cardId}">
-          <img 
-            src="${story.photoUrl}"
-            class="story-img"
-            alt="Foto story oleh ${story.name}: ${story.description}"
-            onerror="this.onerror=null; this.src='/images/gambar-error.png'; this.alt='Gambar tidak tersedia';"
-          />
-          <h3>${story.name}</h3>
-          <p>${story.description}</p>
-          <p><small>${story.createdAt}</small></p>
-          <p><small>Lokasi: ${story.lat}, ${story.lon}</small></p>
-        </div>
-      `;
+      // 1️⃣ RENDER CARD
+      this.container.insertAdjacentHTML(
+        "beforeend",
+        this.createStoryItem(story)
+      );
 
-      // MARKER
-      if (hasLocation && this._map) {
+      const card = this.container.lastElementChild;
+      card.id = cardId;
+
+      // 2️⃣ CARD CLICK → DETAIL PAGE
+      card.addEventListener("click", () => {
+        window.location.hash = `#/story/${story.id}`;
+      });
+
+      // 3️⃣ MAP MARKER
+      if (story.lat && story.lon && this._map) {
         const marker = L.marker([story.lat, story.lon], {
           icon: this.customIcon,
         }).addTo(this._map);
 
-        const popup = `
-            <div>
-              <strong>${story.name}</strong><br>
-              ${story.description}<br>
-              <small>${story.lat}, ${story.lon}</small>
-              <br><br>
-              <button class="popup-scroll-btn" data-target="${cardId}"
-                style="
-                  padding:4px 8px;
-                  border:none;
-                  background:#007bff;
-                  color:white;
-                  border-radius:4px;
-                  cursor:pointer;
-                ">
-                Lihat Story
-              </button>
-            </div>
-        `;
-
-        marker.bindPopup(popup);
+        marker.bindPopup(`
+          <div>
+            <strong>${story.name}</strong><br />
+            ${story.description}<br />
+            <small>${story.lat}, ${story.lon}</small>
+            <br /><br />
+            <button class="popup-scroll-btn" data-target="${cardId}">
+              Lihat Story
+            </button>
+          </div>
+        `);
 
         marker.on("popupopen", (e) => {
           const btn = e.popup.getElement().querySelector(".popup-scroll-btn");
-
           btn?.addEventListener("click", () => {
-            const card = document.getElementById(btn.dataset.target);
-            card.scrollIntoView({ behavior: "smooth", block: "start" });
-            card.style.background = "#fffae6";
-            setTimeout(() => (card.style.background = ""), 1500);
+            const target = document.getElementById(btn.dataset.target);
+            target.scrollIntoView({ behavior: "smooth", block: "start" });
+            target.style.background = "#fffae6";
+            setTimeout(() => (target.style.background = ""), 1500);
           });
         });
 
