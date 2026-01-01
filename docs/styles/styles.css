@@ -65,8 +65,15 @@ h6 {
   opacity: 0 !important;
   pointer-events: none !important;
 }
-
+html,
 body {
+  height: 100%;
+  margin: 0;
+}
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
   font-family: "Quicksand", "Arial", sans-serif;
 }
 
@@ -228,16 +235,23 @@ header {
 .nav-list li a:hover {
   text-decoration: underline;
 }
-
+app-footer {
+  flex-shrink: 0;
+}
 /* MAIN */
 #main-content {
   view-transition-name: main;
 }
 .main-content {
-  padding-block: 20px;
+  flex: 1;
+  display: block;
 
-  padding-top: 10px; /* sesuaikan dengan tinggi header */
+  /* kompensasi header fixed */
+  padding-top: 120px;
+
+  padding-bottom: 32px; /* jarak aman ke footer */
 }
+
 ::view-transition-old(main) {
   animation: fade-out 0.25s ease;
 }
@@ -271,7 +285,6 @@ header {
 /* Story card */
 .story-grid {
   min-height: 200px;
-  max-height: 500px;
   padding: 0 16px 32px;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -626,6 +639,31 @@ header {
 /* =======================
    Gaya tombol sekunder
 ======================= */
+#push-toggle-btn {
+  color: #ffffff; /* warna teks saja */
+  font-weight: 300;
+}
+#push-toggle-btn:hover {
+  color: #000; /* warna teks saja */
+  font-weight: 300;
+}
+#back-btn {
+  color: #ffffff; /* warna teks saja */
+  font-weight: 300;
+}
+#back-btn:hover {
+  color: #000; /* warna teks saja */
+  font-weight: 300;
+}
+#install-btn {
+  color: #ffffff; /* warna teks saja */
+  font-weight: 300;
+}
+#install-btn:hover {
+  color: #000; /* warna teks saja */
+  font-weight: 300;
+}
+
 .btn-secondary {
   display: inline-flex;
   align-items: center;
@@ -634,7 +672,7 @@ header {
   font-size: 14px;
   font-weight: 500;
   color: #333;
-  background-color: #f0f0f0;
+  background-color: #e70000;
   border: 1px solid #ccc;
   border-radius: 6px;
   cursor: pointer;

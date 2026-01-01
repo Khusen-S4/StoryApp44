@@ -655,6 +655,14 @@ app-footer {
   color: #000; /* warna teks saja */
   font-weight: 300;
 }
+#install-btn {
+  color: #ffffff; /* warna teks saja */
+  font-weight: 300;
+}
+#install-btn:hover {
+  color: #000; /* warna teks saja */
+  font-weight: 300;
+}
 
 .btn-secondary {
   display: inline-flex;
