@@ -1,3 +1,9 @@
+const BASE_PATH = "/StoryApp44/";
+const CACHE_NAME = "story-app-v3";
+
+// ==========================
+// PUSH NOTIFICATION
+// ==========================
 self.addEventListener("push", (event) => {
   console.log("[SW] Push event diterima");
 
@@ -8,18 +14,16 @@ self.addEventListener("push", (event) => {
 
   if (event.data) {
     try {
-      data = event.data.json(); // 
-    } catch (err) {
-      data.body = event.data.text(); // 
+      data = event.data.json();
+    } catch {
+      data.body = event.data.text();
     }
   }
 
-  console.log("[SW] Data push:", data);
-
   const options = {
     body: data.body,
-    icon: "/icons/icon-192x192.png",
-    badge: "/icons/icon-192x192.png",
+    icon: `${BASE_PATH}icons/icon-192x192.png`,
+    badge: `${BASE_PATH}icons/icon-192x192.png`,
   };
 
   event.waitUntil(
@@ -27,6 +31,9 @@ self.addEventListener("push", (event) => {
   );
 });
 
+// ==========================
+// MESSAGE FROM CLIENT
+// ==========================
 self.addEventListener("message", (event) => {
   if (event.data?.type !== "NEW_STORY") return;
 
@@ -34,54 +41,68 @@ self.addEventListener("message", (event) => {
 
   self.registration.showNotification(title, {
     body,
-    icon: "/icons/icon-192x192.png",
-    badge: "/icons/icon-192x192.png",
+    icon: `${BASE_PATH}icons/icon-192x192.png`,
+    badge: `${BASE_PATH}icons/icon-192x192.png`,
   });
 });
 
-const CACHE_NAME = "story-app-v2";
-const ASSETS = [
-  "/",
-  "/index.html",
-  "/manifest.json",
-  "/images/marker-bawah.png",
-  "/images/gambar-error.png",
-  "/images/st317.png",
-];
-
+// ==========================
+// INSTALL
+// ==========================
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
+    caches.open(CACHE_NAME).then((cache) =>
+      cache.addAll([
+        BASE_PATH,
+        `${BASE_PATH}index.html`,
+        `${BASE_PATH}manifest.json`,
+        `${BASE_PATH}images/marker-bawah.png`,
+        `${BASE_PATH}images/gambar-error.png`,
+        `${BASE_PATH}images/st317.png`,
+      ])
+    )
   );
+  self.skipWaiting();
 });
 
-
-
-
-
+// ==========================
+// ACTIVATE
+// ==========================
 self.addEventListener("activate", (event) => {
-  event.waitUntil(self.clients.claim());
+  event.waitUntil(
+    caches.keys().then((keys) =>
+      Promise.all(
+        keys.map((key) => {
+          if (key !== CACHE_NAME) {
+            return caches.delete(key);
+          }
+        })
+      )
+    )
+  );
+  self.clients.claim();
 });
 
+// ==========================
+// FETCH
+// ==========================
 self.addEventListener("fetch", (event) => {
-  // ❌ JANGAN CACHE SELAIN GET
-  if (event.request.method !== "GET") {
-    return;
-  }
+  if (event.request.method !== "GET") return;
 
   const url = new URL(event.request.url);
 
-  // API stories (GET saja)
-  if (url.origin === "https://story-api.dicoding.dev" &&
-      url.pathname.startsWith("/v1/stories")) {
-
+  // API stories (cache-first fallback)
+  if (
+    url.origin === "https://story-api.dicoding.dev" &&
+    url.pathname.startsWith("/v1/stories")
+  ) {
     event.respondWith(
       caches.open(CACHE_NAME).then(async (cache) => {
         try {
           const response = await fetch(event.request);
           cache.put(event.request, response.clone());
           return response;
-        } catch (err) {
+        } catch {
           return cache.match(event.request);
         }
       })
@@ -94,7 +115,3 @@ self.addEventListener("fetch", (event) => {
     caches.match(event.request).then((cached) => cached || fetch(event.request))
   );
 });
-
-
-
-
