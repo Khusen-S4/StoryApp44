@@ -1,4 +1,6 @@
 import Api from "../../data/api.js";
+import FavoriteStoryDB from "../../data/favorite-story-db.js";
+
 
 export default class PageItem {
   async render() {
@@ -33,6 +35,8 @@ export default class PageItem {
     container.innerHTML = `
       <div class="item-detail-wrapper">
         <button class="btn-secondary back-btn" id="back-btn">⬅ Kembali</button>
+        <button class="btn-favorit" id="save-btn">⭐ Simpan Story</button>
+        <button class="btn-favorit" id="favorit-btn">📌 Lihat Story Favorit</button>
 
         <article class="item-card">
           <img
@@ -67,5 +71,13 @@ export default class PageItem {
     document.getElementById("back-btn").addEventListener("click", () => {
       window.history.back();
     });
+    document.getElementById("save-btn").addEventListener("click", async () => {
+      await FavoriteStoryDB.addStory(story);
+      alert("✅ Story berhasil disimpan ke favorit");
+    });
+    document.getElementById("favorit-btn").addEventListener("click", () => {
+      window.location.hash = "#/favorit";
+    });
+
   }
 }

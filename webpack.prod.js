@@ -1,11 +1,10 @@
 const common = require("./webpack.common.js");
 const { merge } = require("webpack-merge");
-const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const CopyWebpackPlugin = require("copy-webpack-plugin");
 
 module.exports = merge(common, {
   mode: "production",
+
   module: {
     rules: [
       {
@@ -18,22 +17,24 @@ module.exports = merge(common, {
         use: {
           loader: "babel-loader",
           options: {
-            presets: ["@babel/preset-env"],
+            presets: [
+              [
+                "@babel/preset-env",
+                {
+                  useBuiltIns: "usage",
+                  corejs: 3,
+                },
+              ],
+            ],
           },
         },
       },
     ],
   },
+
   plugins: [
-    new CleanWebpackPlugin(),
-    new MiniCssExtractPlugin(),
-    new CopyWebpackPlugin({
-      patterns: [
-        {
-          from: "src/public/images",
-          to: "images",
-        },
-      ],
+    new MiniCssExtractPlugin({
+      filename: "[name].[contenthash].css",
     }),
   ],
 });
