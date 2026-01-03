@@ -1,6 +1,24 @@
 const BASE_PATH = "/StoryApp44/";
 const CACHE_NAME = "story-app-v3";
 
+// offline
+const APP_SHELL = [
+  "/StoryApp44/",
+  "/StoryApp44/indexoff.html",
+  "/StoryApp44/manifest.json",
+  "/StoryApp44/sw.js",
+  "/StoryApp44/bundle.js",
+  "/StoryApp44/styles/styles.css",
+  "/StoryApp44/images/gambar-error.png",
+  "/StoryApp44/images/layers-2x.png",
+  "/StoryApp44/images/layers.png",
+  "/StoryApp44/images/logo.png",
+  "/StoryApp44/images/marker-bawah.png",
+  "/StoryApp44/images/marker-icon.png",
+  "/StoryApp44/images/marker-shadow.png",
+  "/StoryApp44/images/st317.png",
+];
+
 // ==========================
 // PUSH NOTIFICATION
 // ==========================
@@ -52,18 +70,12 @@ self.addEventListener("message", (event) => {
 self.addEventListener("install", (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) =>
-      cache.addAll([
-        BASE_PATH,
-        `${BASE_PATH}index.html`,
-        `${BASE_PATH}manifest.json`,
-        `${BASE_PATH}images/marker-bawah.png`,
-        `${BASE_PATH}images/gambar-error.png`,
-        `${BASE_PATH}images/st317.png`,
-      ])
+      cache.addAll(APP_SHELL)
     )
   );
   self.skipWaiting();
 });
+
 
 // ==========================
 // ACTIVATE
@@ -89,6 +101,16 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
 
+  // 🔑 HANDLE NAVIGASI (refresh / buka halaman)
+  if (event.request.mode === "navigate") {
+    event.respondWith(
+      fetch(event.request).catch(() =>
+        caches.match(`${BASE_PATH}indexoff.html`)
+      )
+    );
+    return;
+  }
+
   const url = new URL(event.request.url);
 
   // API stories (cache-first fallback)
@@ -112,6 +134,9 @@ self.addEventListener("fetch", (event) => {
 
   // static assets
   event.respondWith(
-    caches.match(event.request).then((cached) => cached || fetch(event.request))
+    caches.match(event.request).then(
+      (cached) => cached || fetch(event.request)
+    )
   );
 });
+
