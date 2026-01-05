@@ -1,6 +1,6 @@
 const path = require("path");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
-const CopyWebpackPlugin = require("copy-webpack-plugin"); // ⬅️ TAMBAHKAN
+const CopyWebpackPlugin = require("copy-webpack-plugin");
 
 module.exports = {
   entry: {
@@ -10,7 +10,6 @@ module.exports = {
   output: {
     filename: "[name].bundle.js",
     path: path.resolve(__dirname, "dist"),
-    publicPath: "/StoryApp44/",
     clean: true,
     assetModuleFilename: "images/[name][ext]",
   },
@@ -33,12 +32,8 @@ module.exports = {
       template: path.resolve(__dirname, "src/index.html"),
     }),
 
-    // ⬇️ INI BAGIAN PENTING
     new CopyWebpackPlugin({
-      patterns: [
-        { from: "src/public/sw.js", to: "sw.js" },
-        { from: "src/public", to: ""}
-      ],
+      patterns: [{ from: "src/public", to: "" }],
     }),
   ],
 

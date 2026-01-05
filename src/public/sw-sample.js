@@ -1,7 +1,6 @@
-import { precacheAndRoute } from "workbox-precaching";
-
-precacheAndRoute(self.__WB_MANIFEST || []);
-
+/* =========================
+   CONFIG
+========================= */
 const BASE_PATH = self.location.pathname.includes("StoryApp44")
   ? "/StoryApp44/"
   : "/";
@@ -15,7 +14,7 @@ const APP_SHELL = [
   `${BASE_PATH}`,
   `${BASE_PATH}indexoff.html`,
   `${BASE_PATH}manifest.json`,
-  // `${BASE_PATH}sw.js`, // dihapus karna sudah dihandle workbox
+  `${BASE_PATH}sw.js`,
 
   `${BASE_PATH}styles/styles.css`,
 
@@ -116,6 +115,7 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
 
+  // ✅ NAVIGATION (SPA + Offline)
   if (event.request.mode === "navigate") {
     event.respondWith(
       caches.match(`${BASE_PATH}indexoff.html`).then((cached) => {
@@ -124,7 +124,6 @@ self.addEventListener("fetch", (event) => {
     );
     return;
   }
-
 
 
   const url = new URL(event.request.url);
