@@ -51,6 +51,15 @@ git commit -m "First deploy"
 git push -u origin main
 4 Akses url sudah siap misal nya https://khusen-s4.github.io/StoryApp44/
 
+Perilaku Offline :
+A. Jalankan online dulu https://khusen-s4.github.io/StoryApp44
+B. Matikan Internet
+Lakukan dibawah ini :
+1. Akses https://khusen-s4.github.io/StoryApp44 muncul Halaman login
+2. Akses https://khusen-s4.github.io/StoryApp44/home muncul indexoff.html
+setelah jalankan Akses poin nomor 2 maka bisa jalankan Akses nomor 3 dibawah ini,
+3. Akses https://khusen-s4.github.io/StoryApp44/#/home muncul cache home-page.js
+
 Masalah subscribe dan notifikasi :
 Aplikasi melakukan subscribe ke endpoint /notifications/subscribe
 setelah izin notifikasi diberikan oleh pengguna. 
